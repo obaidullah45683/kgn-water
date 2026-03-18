@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KGN Waters – Pure. Fresh. Delivered.</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #0066FF;
+    --deep: #001A4D;
+    --ice: #E8F4FD;
+    --sky: #B8DEFF;
+    --white: #FFFFFF;
+    --dark: #0A0E1A;
+    --accent: #00D4FF;
+    --warn: #FF6B00;
+    --green: #00C853;
+    --text: #1A2340;
+    --muted: #6B7A99;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--dark);
+    color: var(--white);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ANIMATED BG */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% -10%, rgba(0,102,255,0.25) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 100%, rgba(0,212,255,0.15) 0%, transparent 50%),
+      var(--dark);
+    z-index: -1;
+  }
+
+  /* NAV */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 5%;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,14,26,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0,102,255,0.15);
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 2rem;
+    letter-spacing: 3px;
+    background: linear-gradient(135deg, var(--accent), var(--blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .logo span { color: var(--white); -webkit-text-fill-color: var(--white); opacity: 0.5; font-size: 0.8rem; display: block; letter-spacing: 4px; margin-top: -6px; }
+
+  .nav-cta {
+    background: var(--blue);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+  }
+  .nav-cta:hover { background: var(--accent); transform: translateY(-1px); }
+
+  /* HERO */
+  .hero {
+    text-align: center;
+    padding: 80px 5% 60px;
+    position: relative;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.3);
+    color: var(--accent);
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .hero h1 {
+    font-family: 'Bebas Neue', cursive;
+    font-size: clamp(3.5rem, 10vw, 7rem);
+    letter-spacing: 4px;
+    line-height: 0.95;
+    margin-bottom: 16px;
+  }
+
+  .hero h1 .blue { color: var(--accent); }
+
+  .hero p {
+    color: rgba(255,255,255,0.55);
+    font-size: 1.1rem;
+    max-width: 500px;
+    margin: 0 auto 36px;
+    line-height: 1.6;
+  }
+
+  .hero-water {
+    position: absolute;
+    top: -20px;
+    right: 5%;
+    width: 200px;
+    opacity: 0.08;
+    font-size: 18rem;
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  /* STATS BAR */
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    background: rgba(255,255,255,0.03);
+    border-top: 1px solid rgba(255,255,255,0.07);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .stat {
+    flex: 1;
+    max-width: 200px;
+    padding: 20px;
+    text-align: center;
+    border-right: 1px solid rgba(255,255,255,0.07);
+  }
+  .stat:last-child { border-right: none; }
+  .stat-num { font-family: 'Bebas Neue', cursive; font-size: 2rem; color: var(--accent); }
+  .stat-lbl { font-size: 0.72rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+
+  /* PRODUCTS */
+  .section {
+    padding: 70px 5%;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 0.72rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    letter-spacing: 2px;
+    margin-bottom: 40px;
+    color: white;
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 20px;
+  }
+
+  .product-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 20px;
+    padding: 28px 24px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,102,255,0.08), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+
+  .product-card:hover::before { opacity: 1; }
+  .product-card:hover { border-color: rgba(0,102,255,0.4); transform: translateY(-4px); }
+  .product-card.selected {
+    border-color: var(--blue);
+    background: rgba(0,102,255,0.12);
+    box-shadow: 0 0 30px rgba(0,102,255,0.2);
+  }
+
+  .product-card.locked {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .product-card.locked:hover { transform: none; border-color: rgba(255,255,255,0.09); }
+
+  .product-icon { font-size: 2.8rem; margin-bottom: 14px; }
+  .product-name { font-weight: 600; font-size: 1rem; margin-bottom: 4px; }
+  .product-sub { color: var(--muted); font-size: 0.82rem; margin-bottom: 14px; }
+  .product-price { font-family: 'DM Mono', monospace; font-size: 1.5rem; color: var(--accent); font-weight: 700; }
+  .product-price span { font-size: 0.8rem; color: var(--muted); font-family: 'DM Sans', sans-serif; }
+
+  .coming-soon-badge {
+    position: absolute;
+    top: 14px; right: 14px;
+    background: rgba(255,107,0,0.15);
+    border: 1px solid rgba(255,107,0,0.3);
+    color: var(--warn);
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-weight: 600;
+  }
+
+  .selected-badge {
+    position: absolute;
+    top: 14px; right: 14px;
+    background: var(--blue);
+    color: white;
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-weight: 600;
+    display: none;
+  }
+  .product-card.selected .selected-badge { display: block; }
+
+  /* QTY CONTROL */
+  .qty-control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  .qty-btn {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.05);
+    color: white;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .qty-btn:hover { background: var(--blue); border-color: var(--blue); }
+  .qty-num { font-family: 'DM Mono', monospace; font-size: 1rem; min-width: 24px; text-align: center; }
+
+  /* ORDER FORM */
+  .order-section {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 24px;
+    padding: 40px;
+    margin-top: 50px;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .form-group.full { grid-column: 1 / -1; }
+
+  .form-group label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    border-color: var(--blue);
+    background: rgba(0,102,255,0.06);
+  }
+
+  .form-group textarea { resize: vertical; min-height: 80px; }
+
+  .form-group select option { background: var(--dark); }
+
+  /* MAP SECTION */
+  .map-section {
+    margin: 18px 0;
+  }
+
+  .map-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+
+  .map-container {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+    height: 260px;
+    background: rgba(255,255,255,0.03);
+    position: relative;
+  }
+
+  #map { width: 100%; height: 100%; }
+
+  .map-hint {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.7);
+    color: rgba(255,255,255,0.7);
+    font-size: 0.75rem;
+    padding: 6px 14px;
+    border-radius: 50px;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  #map-coords {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--accent);
+    margin-top: 6px;
+  }
+
+  /* ORDER SUMMARY */
+  .order-summary {
+    background: rgba(0,102,255,0.08);
+    border: 1px solid rgba(0,102,255,0.2);
+    border-radius: 16px;
+    padding: 20px 24px;
+    margin: 24px 0;
+    display: none;
+  }
+  .order-summary.visible { display: block; }
+  .summary-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .summary-row:last-child { border-bottom: none; font-weight: 700; font-size: 1rem; color: var(--accent); }
+
+  /* SUBMIT BUTTON */
+  .submit-btn {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, var(--blue), var(--accent));
+    border: none;
+    border-radius: 14px;
+    color: white;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.4rem;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(0,102,255,0.4); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* SUCCESS MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: var(--dark);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 24px;
+    padding: 48px 40px;
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+    animation: modalIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.8) translateY(30px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-icon { font-size: 4rem; margin-bottom: 20px; }
+  .modal h2 { font-family: 'Bebas Neue', cursive; font-size: 2.2rem; letter-spacing: 2px; margin-bottom: 10px; color: var(--green); }
+  .modal p { color: rgba(255,255,255,0.6); line-height: 1.6; margin-bottom: 8px; }
+  .modal .order-id { font-family: 'DM Mono', monospace; color: var(--accent); font-size: 1.1rem; margin: 16px 0; }
+  .modal-close {
+    margin-top: 24px;
+    padding: 12px 32px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 50px;
+    color: white;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.15); }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 40px 5%;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+  footer strong { color: var(--accent); }
+
+  /* WAVE DECORATION */
+  .wave-divider { width: 100%; height: 60px; opacity: 0.1; }
+
+  /* MOBILE */
+  @media (max-width: 600px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .stats { flex-wrap: wrap; }
+    .order-section { padding: 24px 20px; }
+    .modal { padding: 36px 24px; }
+    .hero { padding: 50px 5% 40px; }
+  }
+
+  /* LOADER */
+  .loader { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ALERT */
+  .alert { padding: 14px 18px; border-radius: 12px; margin-bottom: 16px; font-size: 0.88rem; display: none; }
+  .alert.error { background: rgba(255,50,50,0.1); border: 1px solid rgba(255,50,50,0.3); color: #FF6B6B; display: block; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div>
+    <div class="logo">KGN Waters</div>
+    <span style="font-size:0.65rem;color:var(--muted);letter-spacing:2px;">PURE · FRESH · DELIVERED</span>
+  </div>
+  <button class="nav-cta" onclick="document.getElementById('order').scrollIntoView({behavior:'smooth'})">Order Now</button>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">💧 Hyderabad's Fresh Water Delivery</div>
+  <h1>PURE WATER<br><span class="blue">DELIVERED</span><br>TO YOUR DOOR</h1>
+  <p>Fresh, clean, and cold water delivered right to your doorstep. Choose your can, pick your quantity, we'll handle the rest.</p>
+  <button class="nav-cta" style="font-size:1rem;padding:14px 36px;" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">
+    Choose Your Water ↓
+  </button>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat"><div class="stat-num">20L</div><div class="stat-lbl">Premium Cans</div></div>
+  <div class="stat"><div class="stat-num">₹40</div><div class="stat-lbl">Starting Price</div></div>
+  <div class="stat"><div class="stat-num">Fast</div><div class="stat-lbl">Same Day</div></div>
+  <div class="stat"><div class="stat-num">100%</div><div class="stat-lbl">Pure Quality</div></div>
+</div>
+
+<!-- PRODUCTS -->
+<div class="section" id="products">
+  <div class="section-label">Our Products</div>
+  <div class="section-title">CHOOSE YOUR WATER</div>
+
+  <div class="products-grid" id="productGrid">
+    <div style="color:var(--muted);padding:40px;text-align:center;grid-column:1/-1;">Loading products...</div>
+  </div>
+  <!-- ORDER FORM -->
+  <div class="order-section" id="order">
+    <div class="section-label" style="margin-bottom:6px;">Place Your Order</div>
+    <h2 style="font-family:'Bebas Neue',cursive;font-size:2rem;letter-spacing:2px;margin-bottom:24px;">DELIVERY DETAILS</h2>
+
+    <div id="formAlert" class="alert"></div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Full Name *</label>
+        <input type="text" id="fname" placeholder="Your name" />
+      </div>
+      <div class="form-group">
+        <label>Phone Number *</label>
+        <input type="tel" id="fphone" placeholder="10-digit mobile" maxlength="10" />
+      </div>
+      <div class="form-group full">
+        <label>Full Address *</label>
+        <textarea id="faddress" placeholder="Flat/House no, Street, Area, Landmark..."></textarea>
+      </div>
+      <div class="form-group full">
+        <label>Delivery Time Preference</label>
+        <select id="ftime">
+          <option value="">Select a time slot</option>
+          <option>Morning (7 AM – 10 AM)</option>
+          <option>Afternoon (11 AM – 2 PM)</option>
+          <option>Evening (4 PM – 7 PM)</option>
+          <option>Anytime</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- MAP -->
+    <div class="map-section">
+      <div class="map-label">📍 Pin Your Location (click on the map)</div>
+      <div class="map-container">
+        <div id="map"></div>
+        <div class="map-hint">Click to drop a pin at your delivery location</div>
+      </div>
+      <div id="map-coords">No pin dropped yet</div>
+    </div>
+
+    <!-- NOTES -->
+    <div class="form-group" style="margin-top:16px;">
+      <label>Special Instructions (optional)</label>
+      <input type="text" id="fnotes" placeholder="Leave near gate, call before delivery, etc." />
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="order-summary" id="orderSummary"></div>
+
+    <button class="submit-btn" id="submitBtn" onclick="placeOrder()">
+      PLACE ORDER
+    </button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <strong>KGN Waters</strong> · Hyderabad &nbsp;|&nbsp; Pure Water, Delivered with Care<br>
+  <span style="margin-top:6px;display:block;">📞 Contact us for bulk orders & subscriptions</span>
+  <br>
+  <a href="admin.html" style="color:rgba(255,255,255,0.2);font-size:0.7rem;text-decoration:none;">Admin</a>
+</footer>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal">
+    <div class="modal-icon">✅</div>
+    <h2>ORDER PLACED!</h2>
+    <p>Thank you! Your water is on its way.</p>
+    <div class="order-id" id="modalOrderId"></div>
+    <p style="font-size:0.82rem;">We'll call you shortly to confirm your delivery. Keep your phone handy! 📞</p>
+    <button class="modal-close" onclick="closeModal()">Back to Home</button>
+  </div>
+</div>
+
+<!-- LEAFLET MAP (free, no API key) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+<script>
+// ── STATE (dynamic from DB) ────────────────────────────────
+const cart = {};
+const prices = {};
+const names = {};
+const units = {};
+let selectedProducts = new Set();
+let mapPin = null;
+let map, marker;
+
+// Product icons mapping
+const productIcons = ['🫧','🧊','📦','💧','🏔️','🚰'];
+
+// ── LOAD PRODUCTS FROM API ─────────────────────────────────
+async function loadProducts() {
+  try {
+    const res  = await fetch('/api/products');
+    const data = await res.json();
+    if (!data.success) throw new Error('Failed to load');
+
+    const grid = document.getElementById('productGrid');
+    grid.innerHTML = '';
+
+    data.products.forEach((p, i) => {
+      const id   = String(p.id);
+      cart[id]   = 1;
+      prices[id] = parseFloat(p.price);
+      names[id]  = p.name;
+      units[id]  = p.unit || 'per unit';
+
+      const icon = productIcons[i] || '💧';
+      const card = document.createElement('div');
+      card.className   = 'product-card';
+      card.dataset.id  = id;
+      card.onclick     = () => selectProduct(card);
+      card.innerHTML   = `
+        <div class="selected-badge">✓ Selected</div>
+        <div class="product-icon">${icon}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="product-sub">${p.description || ''}</div>
+        <div class="product-price">₹${parseFloat(p.price).toFixed(0)} <span>${p.unit}</span></div>
+        <div class="qty-control" onclick="event.stopPropagation()">
+          <button class="qty-btn" onclick="event.stopPropagation();changeQty('${id}',-1)">−</button>
+          <span class="qty-num" id="qty-${id}">1</span>
+          <button class="qty-btn" onclick="event.stopPropagation();changeQty('${id}',1)">+</button>
+        </div>`;
+      grid.appendChild(card);
+    });
+
+  } catch (err) {
+    document.getElementById('productGrid').innerHTML =
+      '<div style="color:var(--warn);padding:20px;grid-column:1/-1;">⚠️ Could not load products. Is the server running?</div>';
+  }
+}
+
+// ── MAP + PRODUCTS INIT ────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  // Load products from DB
+  loadProducts();
+
+  // Init map
+  map = L.map('map').setView([17.385, 78.487], 13); // Hyderabad center
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  map.on('click', (e) => {
+    const { lat, lng } = e.latlng;
+    mapPin = { lat: lat.toFixed(5), lng: lng.toFixed(5) };
+    if (marker) marker.remove();
+    marker = L.marker([lat, lng]).addTo(map).bindPopup('📍 Delivery location').openPopup();
+    document.getElementById('map-coords').textContent = `📍 Pinned: ${mapPin.lat}, ${mapPin.lng}`;
+  });
+});
+
+
+// ── PRODUCT SELECTION ──────────────────────────────────────
+function selectProduct(card) {
+  const id = card.dataset.id;
+  if (card.classList.contains('locked')) return;
+
+  if (selectedProducts.has(id)) {
+    selectedProducts.delete(id);
+    card.classList.remove('selected');
+  } else {
+    // Always sync cart from whatever qty is currently displayed
+    cart[id] = parseInt(document.getElementById('qty-' + id).textContent) || 1;
+    selectedProducts.add(id);
+    card.classList.add('selected');
+  }
+  updateSummary();
+}
+
+function changeQty(id, delta) {
+  const el = document.getElementById('qty-' + id);
+  let val = parseInt(el.textContent) + delta;
+  if (val < 1) val = 1;
+  if (val > 20) val = 20;
+  el.textContent = val;
+  // Always keep cart in sync with display
+  cart[id] = val;
+  if (selectedProducts.has(id)) {
+    updateSummary();
+  }
+}
+
+// ── SUMMARY ────────────────────────────────────────────────
+function updateSummary() {
+  const el = document.getElementById('orderSummary');
+  if (selectedProducts.size === 0) { el.classList.remove('visible'); return; }
+  el.classList.add('visible');
+
+  let total = 0;
+  let rows = '';
+  selectedProducts.forEach(id => {
+    const subtotal = prices[id] * cart[id];
+    total += subtotal;
+    rows += `<div class="summary-row"><span>${names[id]} × ${cart[id]}</span><span>₹${subtotal}</span></div>`;
+  });
+  rows += `<div class="summary-row"><span>TOTAL</span><span>₹${total}</span></div>`;
+  el.innerHTML = rows;
+}
+
+// ── PLACE ORDER ────────────────────────────────────────────
+async function placeOrder() {
+  const alertEl = document.getElementById('formAlert');
+  alertEl.className = 'alert';
+
+  const name    = document.getElementById('fname').value.trim();
+  const phone   = document.getElementById('fphone').value.trim();
+  const address = document.getElementById('faddress').value.trim();
+  const notes   = document.getElementById('fnotes').value.trim();
+  const timeSlot = document.getElementById('ftime').value || 'Anytime';
+
+  if (!name)                       { showAlert('Please enter your name.'); return; }
+  if (!/^\d{10}$/.test(phone))     { showAlert('Please enter a valid 10-digit phone number.'); return; }
+  if (!address)                    { showAlert('Please enter your delivery address.'); return; }
+  if (selectedProducts.size === 0) { showAlert('Please select at least one product.'); return; }
+
+  // Build one order per selected product
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Placing Order...';
+
+  try {
+    // Send all selected products as separate orders (or send the first one if single)
+    // For multi-product support send each as individual API call
+    const orderIds = [];
+
+    for (const id of selectedProducts) {
+      const payload = {
+        customer_name: name,
+        phone,
+        address: address + (mapPin ? ` [GPS: ${mapPin.lat},${mapPin.lng}]` : '') + (timeSlot ? ` | Time: ${timeSlot}` : ''),
+        product_id: parseInt(id), // id is now the real DB product id
+        quantity: cart[id],
+        notes: notes || null
+      };
+
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message);
+      orderIds.push(data.order.order_id);
+    }
+
+    document.getElementById('modalOrderId').textContent = `Order ID: ${orderIds.join(', ')}`;
+    document.getElementById('successModal').classList.add('show');
+
+  } catch (err) {
+    showAlert('Failed to place order: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'PLACE ORDER';
+  }
+}
+
+function showAlert(msg) {
+  const el = document.getElementById('formAlert');
+  el.textContent = msg;
+  el.className = 'alert error';
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function closeModal() {
+  document.getElementById('successModal').classList.remove('show');
+  // Reset form
+  document.getElementById('fname').value = '';
+  document.getElementById('fphone').value = '';
+  document.getElementById('faddress').value = '';
+  document.getElementById('fnotes').value = '';
+  selectedProducts.clear();
+  Object.keys(cart).forEach(k => { cart[k] = 1; });
+  document.querySelectorAll('.qty-num').forEach(el => el.textContent = '1');
+  document.querySelectorAll('.product-card.selected').forEach(c => c.classList.remove('selected'));
+  document.getElementById('orderSummary').classList.remove('visible');
+  if (marker) { marker.remove(); marker = null; }
+  mapPin = null;
+  document.getElementById('map-coords').textContent = 'No pin dropped yet';
+}
+</script>
+</body>
+</html>

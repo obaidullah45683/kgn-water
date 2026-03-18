@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KGN Waters – Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #0066FF;
+    --deep: #001A4D;
+    --ice: #E8F4FD;
+    --accent: #00D4FF;
+    --dark: #0A0E1A;
+    --card: #111827;
+    --border: rgba(255,255,255,0.08);
+    --text: #FFFFFF;
+    --muted: #6B7A99;
+    --green: #00C853;
+    --warn: #FF6B00;
+    --red: #FF3B3B;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--dark);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* LOGIN */
+  .login-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      radial-gradient(ellipse 60% 50% at 50% 0%, rgba(0,102,255,0.2) 0%, transparent 60%),
+      var(--dark);
+  }
+
+  .login-box {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+  }
+
+  .login-logo {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 2.5rem;
+    letter-spacing: 4px;
+    background: linear-gradient(135deg, var(--accent), var(--blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 6px;
+  }
+
+  .login-sub { color: var(--muted); font-size: 0.82rem; margin-bottom: 36px; }
+
+  .login-input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    margin-bottom: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .login-input:focus { border-color: var(--blue); }
+
+  .login-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--blue), var(--accent));
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.3rem;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 6px;
+  }
+  .login-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,102,255,0.3); }
+
+  .login-err { color: #FF6B6B; font-size: 0.82rem; margin-top: 10px; display: none; }
+
+  /* DASHBOARD */
+  .dashboard { display: none; min-height: 100vh; }
+
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: 240px;
+    background: rgba(255,255,255,0.02);
+    border-right: 1px solid var(--border);
+    padding: 28px 20px;
+    display: flex;
+    flex-direction: column;
+    z-index: 50;
+  }
+
+  .sidebar-logo {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.6rem;
+    letter-spacing: 3px;
+    background: linear-gradient(135deg, var(--accent), var(--blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 4px;
+  }
+  .sidebar-sub { font-size: 0.65rem; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 32px; }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    margin-bottom: 4px;
+    text-decoration: none;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+  .nav-item.active { background: rgba(0,102,255,0.15); color: white; border: 1px solid rgba(0,102,255,0.25); }
+  .nav-item .icon { width: 20px; text-align: center; }
+
+  .sidebar-bottom {
+    margin-top: auto;
+  }
+
+  .logout-btn {
+    width: 100%;
+    padding: 10px;
+    background: rgba(255,59,59,0.1);
+    border: 1px solid rgba(255,59,59,0.2);
+    border-radius: 10px;
+    color: var(--red);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .logout-btn:hover { background: rgba(255,59,59,0.2); }
+
+  /* MAIN */
+  .main {
+    margin-left: 240px;
+    padding: 32px 36px;
+    min-height: 100vh;
+  }
+
+  .page-header {
+    margin-bottom: 32px;
+  }
+  .page-header h1 {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 2.2rem;
+    letter-spacing: 2px;
+  }
+  .page-header p { color: var(--muted); font-size: 0.88rem; margin-top: 4px; }
+
+  /* STATS CARDS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 80px; height: 80px;
+    background: radial-gradient(circle, var(--glow, rgba(0,102,255,0.15)), transparent 70%);
+    border-radius: 50%;
+    transform: translate(20px, -20px);
+  }
+
+  .stat-card:nth-child(1) { --glow: rgba(0,102,255,0.2); }
+  .stat-card:nth-child(2) { --glow: rgba(0,200,83,0.2); }
+  .stat-card:nth-child(3) { --glow: rgba(0,212,255,0.2); }
+  .stat-card:nth-child(4) { --glow: rgba(255,107,0,0.2); }
+
+  .stat-card-label { font-size: 0.72rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+  .stat-card-num { font-family: 'Bebas Neue', cursive; font-size: 2.4rem; letter-spacing: 1px; }
+  .stat-card-sub { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
+
+  /* ORDERS TABLE */
+  .table-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .table-header h2 { font-family: 'Bebas Neue', cursive; font-size: 1.4rem; letter-spacing: 1px; }
+
+  .filter-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .filter-select {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 7px 12px;
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    outline: none;
+  }
+  .filter-select option { background: var(--dark); }
+
+  .refresh-btn {
+    padding: 7px 14px;
+    background: rgba(0,102,255,0.15);
+    border: 1px solid rgba(0,102,255,0.25);
+    border-radius: 8px;
+    color: var(--accent);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .refresh-btn:hover { background: rgba(0,102,255,0.25); }
+
+  /* TABLE */
+  .orders-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .status-select { background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:20px;color:white;font-size:0.72rem;font-weight:700;padding:5px 10px;cursor:pointer;letter-spacing:1px; }
+  .status-select.status-new        { border-color:var(--blue);  color:var(--blue);  }
+  .status-select.status-processing { border-color:var(--warn);  color:var(--warn);  }
+  .status-select.status-delivered  { border-color:var(--green); color:var(--green); }
+  .status-select.status-cancelled  { border-color:var(--red);   color:var(--red);   }
+
+  .orders-table th {
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .orders-table td {
+    padding: 14px 16px;
+    font-size: 0.87rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    vertical-align: top;
+  }
+
+  .orders-table tr:last-child td { border-bottom: none; }
+  .orders-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .order-id-cell {
+    font-family: 'DM Mono', monospace;
+    color: var(--accent);
+    font-size: 0.78rem;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .status-new { background: rgba(0,102,255,0.15); color: #60A5FA; border: 1px solid rgba(0,102,255,0.25); }
+  .status-confirmed { background: rgba(0,200,83,0.15); color: #4ADE80; border: 1px solid rgba(0,200,83,0.25); }
+  .status-delivered { background: rgba(100,100,100,0.15); color: #9CA3AF; border: 1px solid rgba(100,100,100,0.2); }
+  .status-cancelled { background: rgba(255,59,59,0.1); color: #F87171; border: 1px solid rgba(255,59,59,0.2); }
+
+  .items-list { font-size: 0.8rem; color: var(--muted); }
+  .items-list strong { color: white; }
+
+  .total-cell { font-family: 'DM Mono', monospace; color: var(--green); font-weight: 600; }
+
+  .action-btn {
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04);
+    color: white;
+    transition: all 0.15s;
+    margin-right: 4px;
+  }
+  .action-btn:hover { background: rgba(255,255,255,0.1); }
+  .action-btn.del { color: var(--red); border-color: rgba(255,59,59,0.2); }
+  .action-btn.del:hover { background: rgba(255,59,59,0.1); }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+  .empty-state .icon { font-size: 3rem; margin-bottom: 12px; opacity: 0.4; }
+
+  /* ORDER DETAIL MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+
+  .detail-modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px;
+    max-width: 560px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalIn 0.3s ease;
+  }
+  @keyframes modalIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
+
+  .detail-modal h2 { font-family:'Bebas Neue',cursive; font-size:1.8rem; letter-spacing:2px; margin-bottom:20px; }
+
+  .detail-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:0.88rem; }
+  .detail-row:last-child { border-bottom:none; }
+  .detail-row .lbl { color:var(--muted); }
+  .detail-row .val { font-weight:500; text-align:right; max-width:65%; }
+
+  .modal-close-btn {
+    margin-top:20px;
+    padding:10px 24px;
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:10px;
+    color:white;
+    cursor:pointer;
+    font-family:'DM Sans',sans-serif;
+  }
+
+  /* MAP IN MODAL */
+  .mini-map { height:180px; border-radius:12px; overflow:hidden; margin:12px 0; }
+
+  /* MOBILE */
+  @media (max-width:900px) {
+    .sidebar { display:none; }
+    .main { margin-left:0; padding:20px 16px; }
+    .stats-grid { grid-template-columns:1fr 1fr; }
+  }
+  @media (max-width:500px) {
+    .stats-grid { grid-template-columns:1fr; }
+    .filter-row { flex-wrap:wrap; }
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:3px; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">KGN Waters</div>
+    <div class="login-sub">Admin Dashboard · Secure Login</div>
+    <input class="login-input" type="text" id="loginUser" placeholder="Username" />
+    <input class="login-input" type="password" id="loginPass" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()" />
+    <button class="login-btn" onclick="doLogin()">LOGIN</button>
+    <div class="login-err" id="loginErr">❌ Invalid credentials</div>
+    <div style="margin-top:20px;font-size:0.72rem;color:var(--muted);">Default: admin / kgn2024</div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboard">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">KGN Waters</div>
+    <div class="sidebar-sub">Admin Panel</div>
+
+    <a class="nav-item active" onclick="showTab('orders')"><span class="icon">📋</span> All Orders</a>
+    <a class="nav-item" onclick="showTab('stats')"><span class="icon">📊</span> Analytics</a>
+    <a class="nav-item" href="index.html" target="_blank"><span class="icon">🌐</span> View Website</a>
+
+    <div class="sidebar-bottom">
+      <div style="font-size:0.7rem;color:var(--muted);text-align:center;margin-bottom:12px;">Logged in as <strong style="color:white;">Admin</strong></div>
+      <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- ORDERS TAB -->
+    <div id="tab-orders">
+      <div class="page-header">
+        <h1>ALL ORDERS</h1>
+        <p id="lastRefresh">Loading orders...</p>
+      </div>
+
+      <!-- STAT CARDS -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-label">Total Orders</div>
+          <div class="stat-card-num" id="statTotal">0</div>
+          <div class="stat-card-sub">All time</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Revenue</div>
+          <div class="stat-card-num" id="statRevenue">₹0</div>
+          <div class="stat-card-sub">Total collected</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Pending</div>
+          <div class="stat-card-num" id="statPending">0</div>
+          <div class="stat-card-sub">New orders</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Today</div>
+          <div class="stat-card-num" id="statToday">0</div>
+          <div class="stat-card-sub">Orders today</div>
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-section">
+        <div class="table-header">
+          <h2>ORDER LIST</h2>
+          <div class="filter-row">
+            <select class="filter-select" id="statusFilter" onchange="renderOrders()">
+              <option value="">All Status</option>
+              <option value="new">New</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <button class="refresh-btn" onclick="loadOrders()">🔄 Refresh</button>
+            <button class="refresh-btn" onclick="exportCSV()" style="background:rgba(0,200,83,0.1);border-color:rgba(0,200,83,0.25);color:#4ADE80;">⬇ Export</button>
+          </div>
+        </div>
+        <div id="ordersTableWrap">
+          <div class="empty-state">
+            <div class="icon">📭</div>
+            <div>No orders yet. Share your website link to get started!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS TAB -->
+    <div id="tab-stats" style="display:none;">
+      <div class="page-header">
+        <h1>ANALYTICS</h1>
+        <p>Product performance & order breakdown</p>
+      </div>
+      <div id="analyticsContent"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detailModal">
+  <div class="detail-modal">
+    <h2>ORDER DETAILS</h2>
+    <div id="detailContent"></div>
+    <button class="modal-close-btn" onclick="document.getElementById('detailModal').classList.remove('show')">Close</button>
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+<script>
+// ── CONFIG ─────────────────────────────────────────────────
+const API = ''; // Empty = same server. Change to 'http://localhost:3000' if running separately
+
+// ── STATE ──────────────────────────────────────────────────
+let orders   = [];
+let miniMap  = null;
+let authToken = sessionStorage.getItem('kgn_token') || null;
+
+// Auto-login if token exists
+window.addEventListener('DOMContentLoaded', () => {
+  if (authToken) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    loadOrders();
+    loadStats();
+  }
+});
+
+// ── AUTH ───────────────────────────────────────────────────
+async function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value.trim();
+  const errEl = document.getElementById('loginErr');
+  errEl.style.display = 'none';
+
+  try {
+    const res  = await fetch(API + '/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: u, password: p })
+    });
+    const data = await res.json();
+
+    if (!data.success) {
+      errEl.textContent = '❌ ' + data.message;
+      errEl.style.display = 'block';
+      return;
+    }
+
+    authToken = data.token;
+    sessionStorage.setItem('kgn_token', authToken);
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    loadOrders();
+    loadStats();
+
+  } catch (err) {
+    errEl.textContent = '❌ Cannot connect to server. Is it running?';
+    errEl.style.display = 'block';
+  }
+}
+
+function logout() {
+  authToken = null;
+  sessionStorage.removeItem('kgn_token');
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('dashboard').style.display = 'none';
+}
+
+// Helper: authenticated fetch
+async function apiFetch(url, options = {}) {
+  const res = await fetch(API + url, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + authToken,
+      ...(options.headers || {})
+    }
+  });
+  if (res.status === 401 || res.status === 403) { logout(); return null; }
+  return res.json();
+}
+
+// ── TABS ───────────────────────────────────────────────────
+function showTab(name) {
+  ['orders','stats'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = t === name ? 'block' : 'none';
+  });
+  document.querySelectorAll('.nav-item').forEach((el, i) => {
+    el.classList.toggle('active', ['orders','stats'][i] === name);
+  });
+  if (name === 'stats') loadStats();
+}
+
+// ── ORDERS ─────────────────────────────────────────────────
+async function loadOrders() {
+  const filter = document.getElementById('statusFilter')?.value || '';
+  const url    = '/api/orders' + (filter ? '?status=' + filter : '');
+  const data   = await apiFetch(url);
+  if (!data) return;
+
+  orders = data.orders || [];
+  renderOrders();
+  document.getElementById('lastRefresh').textContent = 'Last refreshed: ' + new Date().toLocaleTimeString();
+}
+
+async function loadStats() {
+  const data = await apiFetch('/api/products/stats');
+  if (!data) return;
+  const s = data.stats;
+  document.getElementById('statTotal').textContent   = s.total_orders;
+  document.getElementById('statRevenue').textContent = '₹' + parseFloat(s.total_revenue).toFixed(0);
+  document.getElementById('statPending').textContent = s.pending;
+  document.getElementById('statToday').textContent   = s.today_orders;
+  renderAnalytics(s);
+}
+
+function renderOrders() {
+  if (!orders.length) {
+    document.getElementById('ordersTableWrap').innerHTML = `
+      <div class="empty-state"><div class="icon">📭</div><div>No orders yet!</div></div>`;
+    return;
+  }
+
+  const rows = orders.map(o => {
+    const dt = o.created_at ? new Date(o.created_at).toLocaleString('en-IN', { dateStyle:'short', timeStyle:'short' }) : '—';
+    return `<tr>
+      <td><div class="order-id-cell">${o.order_id || '—'}</div><div style="font-size:0.72rem;color:var(--muted);margin-top:3px;">${dt}</div></td>
+      <td><strong>${o.customer_name || '—'}</strong><br><span style="color:var(--muted);font-size:0.8rem;">📞 ${o.phone || ''}</span></td>
+      <td><div class="items-list"><strong>${o.quantity}×</strong> ${o.product_name}</div></td>
+      <td class="total-cell">₹${o.total || 0}</td>
+      <td>
+        <select class="status-select status-${o.status}" onchange="updateStatus(${o.id}, this.value, this)">
+          ${['new','processing','delivered','cancelled'].map(s =>
+            `<option value="${s}" ${o.status===s?'selected':''}>${s.toUpperCase()}</option>`
+          ).join('')}
+        </select>
+      </td>
+      <td>
+        <button class="action-btn" onclick="viewDetail(${orders.indexOf(o)})">👁 View</button>
+        <button class="action-btn del" onclick="deleteOrder(${o.id})">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('ordersTableWrap').innerHTML = `
+    <table class="orders-table">
+      <thead><tr>
+        <th>Order ID / Time</th><th>Customer</th><th>Items</th>
+        <th>Total</th><th>Status</th><th>Actions</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+async function updateStatus(id, status, selectEl) {
+  const data = await apiFetch(`/api/orders/${id}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status })
+  });
+  if (data?.success) {
+    selectEl.className = 'status-select status-' + status;
+    loadStats(); // refresh stat counters
+  } else {
+    alert('Failed to update status');
+  }
+}
+
+async function deleteOrder(id) {
+  if (!confirm('Delete this order permanently?')) return;
+  const data = await apiFetch(`/api/orders/${id}`, { method: 'DELETE' });
+  if (data?.success) { loadOrders(); loadStats(); }
+  else alert('Failed to delete order');
+}
+
+// ── ORDER DETAIL ───────────────────────────────────────────
+function viewDetail(idx) {
+  const o  = orders[idx];
+  const dt = o.created_at ? new Date(o.created_at).toLocaleString('en-IN') : '—';
+
+  document.getElementById('detailContent').innerHTML = `
+    <div class="detail-row"><span class="lbl">Order ID</span><span class="val" style="font-family:DM Mono,monospace;color:var(--accent)">${o.order_id}</span></div>
+    <div class="detail-row"><span class="lbl">Date & Time</span><span class="val">${dt}</span></div>
+    <div class="detail-row"><span class="lbl">Name</span><span class="val">${o.customer_name}</span></div>
+    <div class="detail-row"><span class="lbl">Phone</span><span class="val">📞 ${o.phone}</span></div>
+    <div class="detail-row"><span class="lbl">Address</span><span class="val">${o.address}</span></div>
+    <div class="detail-row"><span class="lbl">Notes</span><span class="val">${o.notes || '—'}</span></div>
+    <div style="margin:14px 0 4px;font-size:0.72rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;">ITEMS ORDERED</div>
+    <div class="detail-row"><span class="lbl">${o.product_name}</span><span class="val">${o.quantity} × ₹${o.unit_price} = ₹${o.total}</span></div>
+    <div class="detail-row" style="font-weight:700;color:var(--green)"><span class="lbl">TOTAL</span><span class="val">₹${o.total}</span></div>
+    <div class="detail-row"><span class="lbl">Status</span><span class="val status-badge status-${o.status}">${o.status.toUpperCase()}</span></div>
+  `;
+
+  document.getElementById('detailModal').classList.add('show');
+}
+
+// ── ANALYTICS ─────────────────────────────────────────────
+function renderAnalytics(s) {
+  if (!s) return;
+  document.getElementById('analyticsContent').innerHTML = `
+    <div class="stats-grid" style="grid-template-columns:repeat(2,1fr)">
+      <div class="stat-card">
+        <div class="stat-card-label">Total Revenue</div>
+        <div class="stat-card-num">₹${parseFloat(s.total_revenue).toFixed(0)}</div>
+        <div class="stat-card-sub">Excluding cancelled</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Today's Orders</div>
+        <div class="stat-card-num">${s.today_orders}</div>
+        <div class="stat-card-sub">Orders placed today</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Total Orders</div>
+        <div class="stat-card-num">${s.total_orders}</div>
+        <div class="stat-card-sub">All time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Pending</div>
+        <div class="stat-card-num">${s.pending}</div>
+        <div class="stat-card-sub">Awaiting processing</div>
+      </div>
+    </div>
+  `;
+}
+
+// ── EXPORT CSV ─────────────────────────────────────────────
+function exportCSV() {
+  if (!orders.length) { alert('No orders to export'); return; }
+  const rows = [
+    ['Order ID','Date','Name','Phone','Address','Product','Qty','Total','Status'],
+    ...orders.map(o => [
+      o.order_id,
+      o.created_at ? new Date(o.created_at).toLocaleString('en-IN') : '',
+      o.customer_name, o.phone,
+      (o.address || '').replace(/,/g, ';'),
+      o.product_name, o.quantity, o.total, o.status
+    ])
+  ];
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const a   = document.createElement('a');
+  a.href     = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'kgn_orders_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+// Close modal on overlay click
+document.getElementById('detailModal').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('show');
+});
+</script>
+</body>
+</html>

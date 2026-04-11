@@ -10,7 +10,7 @@ const auth    = require('../middleware/auth');
 // ─────────────────────────────────────────
 router.post('/', async (req, res) => {
   try {
-    const { customer_name, phone, address, product_id, quantity, notes } = req.body;
+    const { customer_name, phone, address, product_id, quantity, notes, coupon_code } = req.body;
 
     // Validation
     if (!customer_name || !phone || !address || !product_id || !quantity) {
@@ -29,21 +29,58 @@ router.post('/', async (req, res) => {
     }
     const product = products[0];
 
+    // Handle coupon
+    let discountPct = 0;
+    let appliedCoupon = null;
+    if (coupon_code) {
+      const [coupons] = await db.query(
+        'SELECT * FROM coupons WHERE code = ? AND active = 1', [coupon_code.toUpperCase().trim()]
+      );
+      if (coupons.length > 0) {
+        const c = coupons[0];
+        const notExpired = !c.expires_at || new Date(c.expires_at) >= new Date();
+        const withinLimit = c.max_uses === null || c.used_count < c.max_uses;
+        if (notExpired && withinLimit) {
+          discountPct  = c.discount;
+          appliedCoupon = c;
+        }
+      }
+    }
+
     // Generate unique order ID
-    const orderId = 'KGN' + Date.now().toString().slice(-7);
-    const total   = product.price * quantity;
+    const orderId    = 'KGN' + Date.now().toString().slice(-7);
+    const subtotal   = product.price * quantity;
+    const discount   = parseFloat(((subtotal * discountPct) / 100).toFixed(2));
+    const total      = parseFloat((subtotal - discount).toFixed(2));
+    const notesField = [
+      notes || null,
+      appliedCoupon ? `Coupon: ${appliedCoupon.code} (-${discountPct}% = -₹${discount})` : null
+    ].filter(Boolean).join(' | ') || null;
 
     // Insert order
     await db.query(
       `INSERT INTO orders (order_id, customer_name, phone, address, product_id, product_name, quantity, unit_price, total, notes)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [orderId, customer_name, phone, address, product_id, product.name, quantity, product.price, total, notes || null]
+      [orderId, customer_name, phone, address, product_id, product.name, quantity, product.price, total, notesField]
     );
+
+    // Increment coupon usage
+    if (appliedCoupon) {
+      await db.query('UPDATE coupons SET used_count = used_count + 1 WHERE id = ?', [appliedCoupon.id]);
+    }
 
     return res.status(201).json({
       success: true,
       message: 'Order placed successfully!',
-      order: { order_id: orderId, product: product.name, quantity, total }
+      order: {
+        order_id: orderId,
+        product: product.name,
+        quantity,
+        subtotal,
+        discount,
+        total,
+        coupon: appliedCoupon ? appliedCoupon.code : null
+      }
     });
 
   } catch (err) {

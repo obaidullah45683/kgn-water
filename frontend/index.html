@@ -216,7 +216,7 @@
   }
   .product-card.locked:hover { transform: none; border-color: rgba(255,255,255,0.09); }
 
-  .product-icon { font-size: 2.8rem; margin-bottom: 14px; }
+  .product-icon { font-size: 2.8rem; margin-bottom: 14px; display:flex; align-items:center; justify-content:center; height:72px; }
   .product-name { font-weight: 600; font-size: 1rem; margin-bottom: 4px; }
   .product-sub { color: var(--muted); font-size: 0.82rem; margin-bottom: 14px; }
   .product-price { font-family: 'DM Mono', monospace; font-size: 1.5rem; color: var(--accent); font-weight: 700; }
@@ -572,6 +572,17 @@
       <input type="text" id="fnotes" placeholder="Leave near gate, call before delivery, etc." />
     </div>
 
+    <!-- COUPON -->
+    <div class="form-group" style="margin-top:16px;">
+      <label>Coupon Code (optional)</label>
+      <div style="display:flex;gap:10px;">
+        <input type="text" id="fcoupon" placeholder="Enter coupon code e.g. KGNFIRST" style="flex:1;text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()" />
+        <button onclick="applyCoupon()" style="padding:0 20px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:14px;white-space:nowrap;">Apply</button>
+      </div>
+      <div id="couponMsg" style="margin-top:8px;font-size:13px;display:none;"></div>
+    </div>
+
+
     <!-- SUMMARY -->
     <div class="order-summary" id="orderSummary"></div>
 
@@ -614,9 +625,107 @@ const units = {};
 let selectedProducts = new Set();
 let mapPin = null;
 let map, marker;
+let appliedCouponCode = null;
+let appliedDiscount   = 0;
 
 // Product icons mapping
-const productIcons = ['🫧','🧊','📦','💧','🏔️','🚰'];
+const productIcons = [
+  // 20L Can - Normal: water droplet
+  `<svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:72px;height:72px">
+    <defs>
+      <linearGradient id="canGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#60efff"/>
+        <stop offset="100%" stop-color="#0061ff"/>
+      </linearGradient>
+      <linearGradient id="waterGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#a8f0ff" stop-opacity="0.9"/>
+        <stop offset="100%" stop-color="#0099dd" stop-opacity="0.7"/>
+      </linearGradient>
+    </defs>
+    <!-- Can body -->
+    <rect x="18" y="22" width="44" height="48" rx="8" fill="url(#canGrad)" opacity="0.15" stroke="url(#canGrad)" stroke-width="1.5"/>
+    <!-- Water fill -->
+    <rect x="20" y="42" width="40" height="26" rx="0 0 7 7" fill="url(#waterGrad)" opacity="0.5"/>
+    <!-- Can shine -->
+    <rect x="24" y="26" width="6" height="18" rx="3" fill="white" opacity="0.25"/>
+    <!-- Lid -->
+    <rect x="24" y="16" width="32" height="10" rx="5" fill="url(#canGrad)" opacity="0.6"/>
+    <!-- Handle -->
+    <path d="M34 16 Q40 8 46 16" stroke="url(#canGrad)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <!-- Label line -->
+    <rect x="22" y="38" width="36" height="2" rx="1" fill="white" opacity="0.2"/>
+    <!-- Bubbles -->
+    <circle cx="32" cy="52" r="2.5" fill="white" opacity="0.4"/>
+    <circle cx="44" cy="58" r="1.8" fill="white" opacity="0.3"/>
+    <circle cx="38" cy="48" r="1.5" fill="white" opacity="0.35"/>
+  </svg>`,
+
+  // 20L Can - Cold: ice/frost can
+  `<svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:72px;height:72px">
+    <defs>
+      <linearGradient id="coldGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#b8f4ff"/>
+        <stop offset="100%" stop-color="#00c6ff"/>
+      </linearGradient>
+      <linearGradient id="iceGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#e0f9ff"/>
+        <stop offset="100%" stop-color="#74d7f7"/>
+      </linearGradient>
+    </defs>
+    <!-- Can body -->
+    <rect x="18" y="22" width="44" height="48" rx="8" fill="url(#coldGrad)" opacity="0.12" stroke="url(#coldGrad)" stroke-width="1.5"/>
+    <!-- Ice fill -->
+    <rect x="20" y="36" width="40" height="32" rx="0 0 7 7" fill="url(#iceGrad)" opacity="0.35"/>
+    <!-- Frost overlay -->
+    <rect x="20" y="36" width="40" height="10" rx="0" fill="white" opacity="0.2"/>
+    <!-- Can shine -->
+    <rect x="24" y="26" width="6" height="18" rx="3" fill="white" opacity="0.3"/>
+    <!-- Lid -->
+    <rect x="24" y="16" width="32" height="10" rx="5" fill="url(#coldGrad)" opacity="0.7"/>
+    <!-- Handle -->
+    <path d="M34 16 Q40 8 46 16" stroke="url(#coldGrad)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <!-- Snowflake -->
+    <line x1="40" y1="50" x2="40" y2="62" stroke="white" stroke-width="1.5" opacity="0.6"/>
+    <line x1="34" y1="56" x2="46" y2="56" stroke="white" stroke-width="1.5" opacity="0.6"/>
+    <line x1="36" y1="52" x2="44" y2="60" stroke="white" stroke-width="1.5" opacity="0.6"/>
+    <line x1="44" y1="52" x2="36" y2="60" stroke="white" stroke-width="1.5" opacity="0.6"/>
+    <!-- Ice crystals -->
+    <circle cx="40" cy="50" r="1.5" fill="white" opacity="0.7"/>
+    <circle cx="40" cy="62" r="1.5" fill="white" opacity="0.7"/>
+    <circle cx="34" cy="56" r="1.5" fill="white" opacity="0.7"/>
+    <circle cx="46" cy="56" r="1.5" fill="white" opacity="0.7"/>
+  </svg>`,
+
+  // Water Packs: stack of pouches
+  `<svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:72px;height:72px">
+    <defs>
+      <linearGradient id="packGrad1" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#43e97b"/>
+        <stop offset="100%" stop-color="#38f9d7"/>
+      </linearGradient>
+      <linearGradient id="packGrad2" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#38f9d7"/>
+        <stop offset="100%" stop-color="#43e97b"/>
+      </linearGradient>
+    </defs>
+    <!-- Back pack -->
+    <rect x="22" y="28" width="36" height="28" rx="6" fill="url(#packGrad1)" opacity="0.25" stroke="url(#packGrad1)" stroke-width="1.2"/>
+    <!-- Middle pack -->
+    <rect x="18" y="33" width="36" height="28" rx="6" fill="url(#packGrad2)" opacity="0.3" stroke="url(#packGrad2)" stroke-width="1.2"/>
+    <!-- Front pack -->
+    <rect x="22" y="38" width="36" height="28" rx="6" fill="url(#packGrad1)" opacity="0.5" stroke="url(#packGrad1)" stroke-width="1.5"/>
+    <!-- Seal line top -->
+    <rect x="24" y="42" width="32" height="3" rx="1.5" fill="white" opacity="0.3"/>
+    <!-- Seal line bottom -->
+    <rect x="24" y="60" width="32" height="3" rx="1.5" fill="white" opacity="0.3"/>
+    <!-- Straw hole -->
+    <circle cx="52" cy="43.5" r="2.5" fill="white" opacity="0.5"/>
+    <!-- Shine -->
+    <rect x="26" y="46" width="5" height="12" rx="2.5" fill="white" opacity="0.2"/>
+    <!-- Water wave inside -->
+    <path d="M26 54 Q32 50 38 54 Q44 58 50 54" stroke="white" stroke-width="1.5" fill="none" opacity="0.35" stroke-linecap="round"/>
+  </svg>`
+];
 
 // ── LOAD PRODUCTS FROM API ─────────────────────────────────
 async function loadProducts() {
@@ -717,18 +826,59 @@ function updateSummary() {
   if (selectedProducts.size === 0) { el.classList.remove('visible'); return; }
   el.classList.add('visible');
 
-  let total = 0;
+  let subtotal = 0;
   let rows = '';
   selectedProducts.forEach(id => {
-    const subtotal = prices[id] * cart[id];
-    total += subtotal;
-    rows += `<div class="summary-row"><span>${names[id]} × ${cart[id]}</span><span>₹${subtotal}</span></div>`;
+    const lineTotal = prices[id] * cart[id];
+    subtotal += lineTotal;
+    rows += `<div class="summary-row"><span>${names[id]} × ${cart[id]}</span><span>₹${lineTotal}</span></div>`;
   });
-  rows += `<div class="summary-row"><span>TOTAL</span><span>₹${total}</span></div>`;
+  if (appliedDiscount > 0) {
+    const discAmt = Math.round(subtotal * appliedDiscount / 100);
+    const finalTotal = subtotal - discAmt;
+    rows += `<div class="summary-row" style="color:#4ade80;"><span>Discount (${appliedDiscount}% off)</span><span>-₹${discAmt}</span></div>`;
+    rows += `<div class="summary-row"><span>TOTAL</span><span>₹${finalTotal}</span></div>`;
+  } else {
+    rows += `<div class="summary-row"><span>TOTAL</span><span>₹${subtotal}</span></div>`;
+  }
   el.innerHTML = rows;
 }
 
+// ── COUPON ─────────────────────────────────────────────────
+async function applyCoupon() {
+  const code = document.getElementById('fcoupon').value.trim().toUpperCase();
+  const msg  = document.getElementById('couponMsg');
+  msg.style.display = 'none';
+  if (!code) { msg.style.display='block'; msg.style.color='#f87171'; msg.textContent='Please enter a coupon code.'; return; }
+
+  try {
+    const res  = await fetch('/api/coupons/validate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code })
+    });
+    const data = await res.json();
+    msg.style.display = 'block';
+    if (data.success) {
+      appliedCouponCode = data.coupon.code;
+      appliedDiscount   = data.coupon.discount;
+      msg.style.color   = '#4ade80';
+      msg.textContent   = `Coupon applied! You get ${data.coupon.discount}% off.`;
+      updateSummary();
+    } else {
+      appliedCouponCode = null;
+      appliedDiscount   = 0;
+      msg.style.color   = '#f87171';
+      msg.textContent   = data.message;
+      updateSummary();
+    }
+  } catch(e) {
+    msg.style.display='block'; msg.style.color='#f87171'; msg.textContent='Could not validate coupon.';
+  }
+}
+
 // ── PLACE ORDER ────────────────────────────────────────────
+
 async function placeOrder() {
   const alertEl = document.getElementById('formAlert');
   alertEl.className = 'alert';
@@ -760,8 +910,10 @@ async function placeOrder() {
         phone,
         address: address + (mapPin ? ` [GPS: ${mapPin.lat},${mapPin.lng}]` : '') + (timeSlot ? ` | Time: ${timeSlot}` : ''),
         product_id: parseInt(id), // id is now the real DB product id
+        coupon_code: appliedCouponCode || null,
         quantity: cart[id],
-        notes: notes || null
+        notes: notes || null,
+        coupon_code: appliedCouponCode || null
       };
 
       const res = await fetch('/api/orders', {
@@ -800,6 +952,10 @@ function closeModal() {
   document.getElementById('fphone').value = '';
   document.getElementById('faddress').value = '';
   document.getElementById('fnotes').value = '';
+  document.getElementById('fcoupon').value = '';
+  document.getElementById('couponMsg').style.display = 'none';
+  appliedCouponCode = null;
+  appliedDiscount = 0;
   selectedProducts.clear();
   Object.keys(cart).forEach(k => { cart[k] = 1; });
   document.querySelectorAll('.qty-num').forEach(el => el.textContent = '1');

@@ -738,7 +738,7 @@ const productIcons = [
 // ── LOAD PRODUCTS FROM API ─────────────────────────────────
 async function loadProducts() {
   try {
-    const res  = await fetch('/api/products');
+    const res  = await fetch('https://kgn-water.onrender.com/api/products');
     const data = await res.json();
     if (!data.success) throw new Error('Failed to load');
 
@@ -860,7 +860,7 @@ async function applyCoupon() {
   if (!code) { msg.style.display='block'; msg.style.color='#f87171'; msg.textContent='Please enter a coupon code.'; return; }
 
   try {
-    const res  = await fetch('/api/coupons/validate', {
+    const res  = await fetch('https://kgn-water.onrender.com/api/coupons/validate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ code })
@@ -929,7 +929,7 @@ async function placeOrder() {
         coupon_code: appliedCouponCode || null
       };
 
-      const res = await fetch('/api/orders', {
+      const res = await fetch('https://kgn-water.onrender.com/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TV2LGR8GCY"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-TV2LGR8GCY');
+</script>
 <title>KGN Waters – Pure. Fresh. Delivered.</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono&display=swap" rel="stylesheet">
 <style>
@@ -865,6 +873,11 @@ async function applyCoupon() {
       msg.style.color   = '#4ade80';
       msg.textContent   = `Coupon applied! You get ${data.coupon.discount}% off.`;
       updateSummary();
+      // Google Analytics - Track coupon applied
+      gtag('event', 'select_promotion', {
+        promotion_name: data.coupon.code,
+        discount: data.coupon.discount
+      });
     } else {
       appliedCouponCode = null;
       appliedDiscount   = 0;
@@ -929,6 +942,16 @@ async function placeOrder() {
 
     document.getElementById('modalOrderId').textContent = `Order ID: ${orderIds.join(', ')}`;
     document.getElementById('successModal').classList.add('show');
+
+    // Google Analytics - Track order placed
+    gtag('event', 'purchase', {
+      transaction_id: orderIds.join(','),
+      coupon: appliedCouponCode || '',
+      items: Array.from(selectedProducts).map(id => ({
+        item_id: id,
+        quantity: cart[id]
+      }))
+    });
 
   } catch (err) {
     showAlert('Failed to place order: ' + err.message);
